@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "545418634261",
+    "project_id": "location-demo-5b914",
+    "storage_bucket": "location-demo-5b914.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545418634261:android:2a3cd7c0f23d08a90a1a1c",
+        "android_client_info": {
+          "package_name": "com.fore.location_trackingv2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2_yDzAtWVZvdyoYJq7PIEBtjuHtsOTuK"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
