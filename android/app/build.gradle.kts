@@ -3,18 +3,14 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
-    id("com.google.gms.google-services") version "4.4.2" apply false 
+    id("com.google.gms.google-services")
 }
 dependencies {
-  // Import the Firebase BoM
+   // Import the Firebase BoM
   implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
-
-
-  // TODO: Add the dependencies for Firebase products you want to use
-  // When using the BoM, don't specify versions in Firebase dependencies
+  implementation("com.android.support:multidex:1.0.3")
   implementation("com.google.firebase:firebase-analytics")
-
-
+    
   // Add the dependencies for any other desired Firebase products
   // https://firebase.google.com/docs/android/setup#available-libraries
 }
@@ -37,7 +33,7 @@ android {
         applicationId = "com.example.location_trackingv2"
         // Minimum Android version for Google Maps SDK
         // https://developers.google.com/maps/flutter-package/config#android
-        minSdk = 21
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
