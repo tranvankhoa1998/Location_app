@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import '../../domain/entities/task.dart';
 
 class TaskModel {
@@ -7,21 +5,52 @@ class TaskModel {
   final String task;
   final int number;
   final DateTime date;
+  final String? description;
 
   TaskModel({
-    required this.id, 
-    required this.task, 
-    required this.number, 
-    required this.date});
+    required this.id,
+    required this.task,
+    required this.number,
+    required this.date,
+    this.description,
+  });
 
-  factory TaskModel.fromFirestore(String id, Map<String, dynamic> data) {
+  factory TaskModel.fromJson(Map<String, dynamic> json) {
+    DateTime dateTime;
+    
+    if (json['date'] is int) {
+      dateTime = DateTime.fromMillisecondsSinceEpoch(json['date']);
+    } else if (json['date'] is DateTime) {
+      dateTime = json['date'];
+    } else {
+      dateTime = DateTime.now();
+    }
+    
     return TaskModel(
-      id: id,
-      task: data['task'] ?? '',
-      number: data['number'] ?? 0,
-      date: (data['date'] as Timestamp).toDate(),
+      id: json['id'] ?? '',
+      task: json['task'] ?? '',
+      number: json['number'] ?? 0,
+      date: dateTime,
+      description: json['description'],
     );
   }
 
-  Task toEntity() => Task(id: id, task: task, number: number, date: date);
+  Map<String, dynamic> toJson() {
+    return {
+      'task': task,
+      'number': number,
+      'date': date.millisecondsSinceEpoch,
+      'description': description,
+    };
+  }
+
+  Task toEntity() {
+    return Task(
+      id: id,
+      task: task,
+      number: number,
+      date: date,
+      description: description,
+    );
+  }
 }

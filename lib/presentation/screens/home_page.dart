@@ -1,73 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../task_cubit.dart';
-import '../../domain/entities/task.dart';
-import '../widgets/task_column.dart';
+import '../screens/task_list.dart';
+import '../screens/task_cubit.dart';
+import 'calendar_page.dart';
 import 'create_new_task_page.dart';
-import '../theme/colors/light_colors.dart'; // Import để dùng màu
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final currentUser = FirebaseAuth.instance.currentUser;
+    
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Task Planner',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
+      appBar: AppBar(
+        title: Text('Quản lý Task'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.calendar_today),
+            onPressed: () {
+              // LẤY CUBIT HIỆN TẠI
+              final taskCubit = BlocProvider.of<TaskCubit>(context);
+              
+              // TRUYỀN CUBIT VÀO TRANG MỚI
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: taskCubit,
+                    child: CalendarPage(),
+                  ),
                 ),
-              ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.exit_to_app),
+            onPressed: () async {
+              await FirebaseAuth.instance.signOut();
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.blue[100],
+                  child: Icon(Icons.person, color: Colors.blue),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        currentUser?.email ?? 'Người dùng',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'ID: ${currentUser?.uid ?? "Unknown"}',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: BlocBuilder<TaskCubit, List<Task>>(
-                builder: (context, tasks) {
-                  if (tasks.isEmpty) {
-                    return const Center(
-                      child: Text('Không có task nào!'),
-                    );
-                  }
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: tasks.length,
-                    itemBuilder: (context, index) {
-                      final task = tasks[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: TaskColumn(
-                          icon: Icons.check_circle_outline,
-                          iconBackgroundColor: LightColors.kBlue,
-                          title: task.task,
-                          subtitle: 'Task #${task.number} - ${task.date.day}/${task.date.month}/${task.date.year}',
-                          task: task,
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: TaskList(),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: LightColors.kBlue,
-        onPressed: () async {
-          await Navigator.push(
+        onPressed: () {
+          // LẤY CUBIT HIỆN TẠI
+          final taskCubit = BlocProvider.of<TaskCubit>(context);
+          
+          // TRUYỀN CUBIT VÀO TRANG MỚI
+          Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const CreateNewTaskPage()),
+            MaterialPageRoute(
+              builder: (context) => BlocProvider.value(
+                value: taskCubit,
+                child: CreateNewTaskPage(),
+              ),
+            ),
           );
         },
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add),
       ),
     );
   }

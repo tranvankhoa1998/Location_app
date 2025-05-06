@@ -1,13 +1,14 @@
 {
   "project_info": {
-    "project_number": "9944351383",
-    "project_id": "location-895ab",
-    "storage_bucket": "location-895ab.firebasestorage.app"
+    "project_number": "288227205093",
+    "firebase_url": "https://locaition-7e0c2-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "locaition-7e0c2",
+    "storage_bucket": "locaition-7e0c2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:9944351383:android:9ebcf0c7dd642bb00a5fd2",
+        "mobilesdk_app_id": "1:288227205093:android:82d00a16af7b93609b190c",
         "android_client_info": {
           "package_name": "com.example.location_trackingv2"
         }
@@ -15,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCwI5pj1eIeHFWPfhPg8VSzJtwF8j2XGoc"
+          "current_key": "AIzaSyA_5ySLsynEKvhPh1K4xeeoNm1X5QSf3Yo"
         }
       ],
       "services": {
