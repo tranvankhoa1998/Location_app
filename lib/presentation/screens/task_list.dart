@@ -62,10 +62,10 @@ class TaskList extends StatelessWidget {
 
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      elevation: 0, // Giảm độ nâng để tránh lỗi OpenGL
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey[300]!), // Dùng border thay vì shadow
+        side: BorderSide(color: Colors.grey[300]!),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -167,12 +167,15 @@ class TaskList extends StatelessWidget {
   }
 
   void _showTaskDetails(BuildContext context, Task task) {
+    // LƯU CUBIT TRƯỚC KHI MỞ DIALOG
+    final taskCubit = BlocProvider.of<TaskCubit>(context, listen: false);
+    
     final dateFormatter = DateFormat('dd/MM/yyyy');
     final timeFormatter = DateFormat('HH:mm');
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text(
           task.task,
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -219,12 +222,12 @@ class TaskList extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: Text('Đóng'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(dialogContext);
               _showEditDialog(context, task);
             },
             child: Text('Chỉnh sửa'),
@@ -235,146 +238,156 @@ class TaskList extends StatelessWidget {
   }
 
   void _showEditDialog(BuildContext context, Task task) {
-  final titleController = TextEditingController(text: task.task);
-  final descriptionController = TextEditingController(text: task.description ?? '');
-  DateTime selectedDate = task.date;
-  
-  showDialog(
-    context: context,
-    builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text('Chỉnh sửa Task'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(labelText: 'Tiêu đề'),
-                  ),
-                  SizedBox(height: 16),
-                  TextField(
-                    controller: descriptionController,
-                    decoration: InputDecoration(labelText: 'Mô tả'),
-                    maxLines: 3,
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          child: Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
-                          onPressed: () async {
-                            final now = DateTime.now();
-                            final lastDate = DateTime(now.year + 5, now.month, now.day);
-                            
-                            final date = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate,
-                              firstDate: DateTime(2020),
-                              lastDate: lastDate,
-                            );
-                            
-                            if (date != null) {
-                              setState(() {
-                                selectedDate = DateTime(
-                                  date.year,
-                                  date.month,
-                                  date.day,
-                                  selectedDate.hour,
-                                  selectedDate.minute,
-                                );
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: OutlinedButton(
-                          child: Text(DateFormat('HH:mm').format(selectedDate)),
-                          onPressed: () async {
-                            final time = await showTimePicker(
-                              context: context,
-                              initialTime: TimeOfDay.fromDateTime(selectedDate),
-                            );
-                            
-                            if (time != null) {
-                              setState(() {
-                                selectedDate = DateTime(
-                                  selectedDate.year,
-                                  selectedDate.month,
-                                  selectedDate.day,
-                                  time.hour,
-                                  time.minute,
-                                );
-                              });
-                            }
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text('Hủy'),
-              ),
-              TextButton(
-                onPressed: () {
-                  final newTitle = titleController.text.trim();
-                  final newDescription = descriptionController.text.trim();
-                  
-                  if (newTitle.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Tiêu đề không được để trống')),
-                    );
-                    return;
-                  }
-                  
-                  try {
-                    // LẤY CUBIT TỪ CONTEXT GỐC
-                    final taskCubit = BlocProvider.of<TaskCubit>(context, listen: false);
-                    
-                    taskCubit.updateExistingTask(
-                      id: task.id,
-                      title: newTitle,
-                      date: selectedDate,
-                      description: newDescription.isEmpty ? null : newDescription,
-                    );
-                    
-                    Navigator.pop(context);
-                  } catch (e) {
-                    print('ERROR updating task: $e');
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Lỗi: $e')),
-                    );
-                  }
-                },
-                child: Text('Lưu'),
-              ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
-
-  void _showDeleteConfirmation(BuildContext context, Task task) {
+    // LƯU CUBIT TRƯỚC KHI MỞ DIALOG
+    final taskCubit = BlocProvider.of<TaskCubit>(context, listen: false);
+    
+    final titleController = TextEditingController(text: task.task);
+    final descriptionController = TextEditingController(text: task.description ?? '');
+    DateTime selectedDate = task.date;
+    
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (builderContext, setState) {
+            return AlertDialog(
+              title: Text('Chỉnh sửa Task'),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(labelText: 'Tiêu đề'),
+                    ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: descriptionController,
+                      decoration: InputDecoration(labelText: 'Mô tả'),
+                      maxLines: 3,
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            child: Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
+                            onPressed: () async {
+                              final now = DateTime.now();
+                              final lastDate = DateTime(now.year + 5, now.month, now.day);
+                              
+                              final date = await showDatePicker(
+                                context: dialogContext,
+                                initialDate: selectedDate,
+                                firstDate: DateTime(2020),
+                                lastDate: lastDate,
+                              );
+                              
+                              if (date != null) {
+                                setState(() {
+                                  selectedDate = DateTime(
+                                    date.year,
+                                    date.month,
+                                    date.day,
+                                    selectedDate.hour,
+                                    selectedDate.minute,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton(
+                            child: Text(DateFormat('HH:mm').format(selectedDate)),
+                            onPressed: () async {
+                              final time = await showTimePicker(
+                                context: dialogContext,
+                                initialTime: TimeOfDay.fromDateTime(selectedDate),
+                              );
+                              
+                              if (time != null) {
+                                setState(() {
+                                  selectedDate = DateTime(
+                                    selectedDate.year,
+                                    selectedDate.month,
+                                    selectedDate.day,
+                                    time.hour,
+                                    time.minute,
+                                  );
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.grey[700],
+                  ),
+                  child: Text('Hủy'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    final newTitle = titleController.text.trim();
+                    final newDescription = descriptionController.text.trim();
+                    
+                    if (newTitle.isEmpty) {
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(content: Text('Tiêu đề không được để trống')),
+                      );
+                      return;
+                    }
+                    
+                    try {
+                      // DÙNG CUBIT ĐÃ LƯU TRƯỚC ĐÓ
+                      taskCubit.updateExistingTask(
+                        id: task.id,
+                        title: newTitle,
+                        date: selectedDate,
+                        description: newDescription.isEmpty ? null : newDescription,
+                      );
+                      
+                      Navigator.pop(dialogContext);
+                    } catch (e) {
+                      print('ERROR updating task: $e');
+                      ScaffoldMessenger.of(dialogContext).showSnackBar(
+                        SnackBar(content: Text('Lỗi: $e')),
+                      );
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    foregroundColor: Theme.of(dialogContext).colorScheme.primary,
+                  ),
+                  child: Text('Lưu'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context, Task task) {
+    // LƯU CUBIT TRƯỚC KHI MỞ DIALOG
+    final taskCubit = BlocProvider.of<TaskCubit>(context, listen: false);
+    
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
         title: Text('Xóa Task'),
         content: Text('Bạn có chắc chắn muốn xóa task "${task.task}" không?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey[700],
             ),
@@ -382,8 +395,16 @@ class TaskList extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              context.read<TaskCubit>().deleteExistingTask(task.id);
-              Navigator.pop(context);
+              try {
+                // DÙNG CUBIT ĐÃ LƯU
+                taskCubit.deleteExistingTask(task.id);
+                Navigator.pop(dialogContext);
+              } catch (e) {
+                print('ERROR deleting task: $e');
+                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                  SnackBar(content: Text('Lỗi: $e')),
+                );
+              }
             },
             style: TextButton.styleFrom(
               foregroundColor: Colors.red,

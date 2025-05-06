@@ -5,6 +5,8 @@ import '../screens/task_list.dart';
 import '../screens/task_cubit.dart';
 import 'calendar_page.dart';
 import 'create_new_task_page.dart';
+import '../screen_2/location_map_page.dart';  // Thêm import này
+import '../screen_2/location_cubit.dart';  // Thêm import này
 
 class HomePage extends StatelessWidget {
   @override
@@ -15,6 +17,26 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Quản lý Task'),
         actions: [
+          // THÊM NÚT BẢN ĐỒ VÀO ĐÂY
+          IconButton(
+            icon: Icon(Icons.map),
+            onPressed: () {
+              // LẤY LOCATION CUBIT HIỆN TẠI
+              final locationCubit = BlocProvider.of<LocationCubit>(context);
+              
+              // TRUYỀN LOCATION CUBIT VÀO TRANG BẢN ĐỒ
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider.value(
+                    value: locationCubit,
+                    child: LocationMapPage(),
+                  ),
+                ),
+              );
+            },
+          ),
+          // NÚT CALENDAR HIỆN TẠI
           IconButton(
             icon: Icon(Icons.calendar_today),
             onPressed: () {

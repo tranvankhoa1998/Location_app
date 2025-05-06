@@ -1,26 +1,17 @@
+// lib/data/datasources/auth_service.dart
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // Lấy User ID hiện tại
-  String? get currentUserId => _auth.currentUser?.uid;
+  // Trả về stream để theo dõi trạng thái đăng nhập
+  Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  // Đăng ký với email và password
-  Future<UserCredential> signUp(String email, String password) async {
-    try {
-      return await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-    } catch (e) {
-      print('Lỗi đăng ký: $e');
-      rethrow;
-    }
-  }
+  // Lấy người dùng hiện tại
+  User? get currentUser => _auth.currentUser;
 
   // Đăng nhập với email và password
-  Future<UserCredential> signIn(String email, String password) async {
+  Future<UserCredential> signInWithEmailPassword(String email, String password) async {
     try {
       return await _auth.signInWithEmailAndPassword(
         email: email,
@@ -32,18 +23,36 @@ class AuthService {
     }
   }
 
-  // Đăng nhập ẩn danh (nếu bạn không muốn yêu cầu người dùng đăng ký)
-  Future<UserCredential> signInAnonymously() async {
+  // Đăng ký với email và password
+  Future<UserCredential> registerWithEmailPassword(String email, String password) async {
     try {
-      return await _auth.signInAnonymously();
+      return await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
     } catch (e) {
-      print('Lỗi đăng nhập ẩn danh: $e');
+      print('Lỗi đăng ký: $e');
       rethrow;
     }
   }
 
   // Đăng xuất
   Future<void> signOut() async {
-    await _auth.signOut();
+    try {
+      return await _auth.signOut();
+    } catch (e) {
+      print('Lỗi đăng xuất: $e');
+      rethrow;
+    }
+  }
+
+  // Gửi email đặt lại mật khẩu
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print('Lỗi gửi email đặt lại mật khẩu: $e');
+      rethrow;
+    }
   }
 }
