@@ -12,9 +12,6 @@ class LocationModel extends Location {
   }) : super(
           latitude: latitude,
           longitude: longitude,
-          accuracy: accuracy,
-          altitude: altitude,
-          speed: speed,
           timestamp: timestamp,
         );
 
@@ -31,13 +28,14 @@ class LocationModel extends Location {
 
   factory LocationModel.fromJson(Map<String, dynamic> json) {
     return LocationModel(
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      accuracy: json['accuracy'] ?? 0.0,
-      altitude: json['altitude'] ?? 0.0,
-      speed: json['speed'] ?? 0.0,
+      latitude: (json['latitude'] is num) ? (json['latitude'] as num).toDouble() : 0.0,
+      longitude: (json['longitude'] is num) ? (json['longitude'] as num).toDouble() : 0.0,
+      accuracy: (json['accuracy'] is num) ? (json['accuracy'] as num).toDouble() : 0.0,
+      altitude: (json['altitude'] is num) ? (json['altitude'] as num).toDouble() : 0.0,
+      speed: (json['speed'] is num) ? (json['speed'] as num).toDouble() : 0.0,
       timestamp: json['timestamp'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(json['timestamp'])
+          ? DateTime.fromMillisecondsSinceEpoch(
+              (json['timestamp'] is num) ? (json['timestamp'] as num).toInt() : 0)
           : DateTime.now(),
     );
   }
@@ -46,9 +44,6 @@ class LocationModel extends Location {
     return {
       'latitude': latitude,
       'longitude': longitude,
-      'accuracy': accuracy,
-      'altitude': altitude,
-      'speed': speed,
       'timestamp': timestamp.millisecondsSinceEpoch,
     };
   }

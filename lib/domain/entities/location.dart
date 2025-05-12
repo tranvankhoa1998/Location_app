@@ -1,18 +1,29 @@
-// lib/domain/entities/location.dart
 class Location {
   final double latitude;
   final double longitude;
-  final double accuracy;
-  final double altitude;
-  final double speed;
   final DateTime timestamp;
 
   Location({
     required this.latitude,
     required this.longitude,
-    required this.accuracy,
-    required this.altitude,
-    required this.speed,
     required this.timestamp,
   });
-}
+
+  Map<String, dynamic> toMap() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+      'timestamp': timestamp.millisecondsSinceEpoch,
+    };
+  }
+
+  factory Location.fromMap(Map<String, dynamic> map) {
+    return Location(
+      latitude: (map['latitude'] is num) ? (map['latitude'] as num).toDouble() : 0.0,
+      longitude: (map['longitude'] is num) ? (map['longitude'] as num).toDouble() : 0.0,
+      timestamp: DateTime.fromMillisecondsSinceEpoch(
+        (map['timestamp'] is num) ? (map['timestamp'] as num).toInt() : 0,
+      ),
+    );
+  }
+} 

@@ -1,0 +1,10 @@
+import '../entities/user.dart';
+
+abstract class UserRepository {
+  Future<User?> getUserById(String uid);
+  Stream<List<User>> getAllUsers();
+  Stream<List<User>> getUsersByRole(UserRole role);
+  Future<void> createUserProfile(String uid, String email, {UserRole role = UserRole.user});
+  Future<void> updateUserRole(String uid, UserRole role);
+  Future<void> updateUserProfile(String uid, {String? name, String? email});
+} 

@@ -1,4 +1,4 @@
-import '../entities/location.dart';
+import 'package:firebase_database/firebase_database.dart';
 import '../repositories/location_repository.dart';
 
 class GetLocationStream {
@@ -6,7 +6,7 @@ class GetLocationStream {
 
   GetLocationStream(this.repository);
 
-  Stream<Location> call() {
-    return repository.getLocationStream();
+  Stream<DatabaseEvent> call(String userId) {
+    return repository.getUserLocationStream(userId);
   }
 }
