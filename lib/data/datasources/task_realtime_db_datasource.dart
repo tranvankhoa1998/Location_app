@@ -9,8 +9,6 @@ class TaskRealtimeDBDataSource {
 
   TaskRealtimeDBDataSource() {
     final userId = _auth.currentUser?.uid;
-    print('DEBUG: User ID: $userId');
-    print('DEBUG: Database URL: ${FirebaseDatabase.instance.databaseURL}');
     
     if (userId == null) {
       throw Exception('Người dùng chưa đăng nhập');
@@ -18,8 +16,6 @@ class TaskRealtimeDBDataSource {
     
     // Sửa lại đường dẫn để khớp với cấu trúc JSON
     _userTasksRef = _database.ref().child('tasks').child(userId);
-    print('DEBUG: Đường dẫn database: ${_userTasksRef.path}');
-    print('DEBUG: User ID: ${_auth.currentUser?.uid}');
     
     // Thử ghi test
     _userTasksRef.child('task_id_3').set({
@@ -27,27 +23,17 @@ class TaskRealtimeDBDataSource {
       'description': 'Cập nhật các tính năng mới cho website',
       'date': 1715802000000,
       'number': 3
-   }).timeout(Duration(seconds: 10))
-.then((_) {
-  print('Test write thành công!');
-}).catchError((error) {
-  print('Test write ERROR: $error');
-});
+   }).timeout(Duration(seconds: 10));
   }
   
 
   Stream<List<TaskModel>> getTasks() {
-    print('DEBUG: Bắt đầu lắng nghe từ: ${_userTasksRef.path}');
-    print('DEBUG: User ID: ${_auth.currentUser?.uid}');
-    
     return _userTasksRef.onValue.map((event) {
       final snapshot = event.snapshot;
-      print('DEBUG: Nhận event từ Firebase, snapshot exists: ${snapshot.exists}');
       
       if (snapshot.exists && snapshot.value != null) {
         try {
           final tasksMap = snapshot.value as Map<dynamic, dynamic>;
-          print('DEBUG: Số task nhận được: ${tasksMap.length}');
           
           final tasks = tasksMap.entries.map((entry) {
             // Bỏ qua test entry
@@ -55,7 +41,6 @@ class TaskRealtimeDBDataSource {
             
             try {
               final taskData = Map<String, dynamic>.from(entry.value as Map);
-              print('DEBUG: Task ID: ${entry.key}, Task: ${taskData['task']}');
               
               // Chuyển timestamp thành DateTime
               DateTime taskDate;
@@ -73,7 +58,6 @@ class TaskRealtimeDBDataSource {
                 description: taskData['description'],
               );
             } catch (e) {
-              print('Lỗi parse task data: $e');
               return null;
             }
           }).whereType<TaskModel>().toList(); // Lọc các giá trị null
@@ -82,15 +66,12 @@ class TaskRealtimeDBDataSource {
           tasks.sort((a, b) => a.number.compareTo(b.number));
           return tasks;
         } catch (e) {
-          print('Lỗi parse dữ liệu: $e');
           return <TaskModel>[];
         }
       }
       
-      print('DEBUG: Snapshot không tồn tại hoặc null');
       return <TaskModel>[];
     }).handleError((error) {
-      print('ERROR trong stream getTasks: $error');
       return <TaskModel>[];
     });
   }
@@ -114,14 +95,12 @@ class TaskRealtimeDBDataSource {
               .where((e) => e.key != 'test')
               .length + 1;
         } catch (e) {
-          print('Lỗi lấy số task: $e');
+          // Xử lý lỗi mà không cần print
         }
       }
       
       final newTaskRef = _userTasksRef.push();
       final taskId = newTaskRef.key!;
-      
-      print('Đang thêm task với ID: $taskId, path: ${newTaskRef.path}');
       
       await newTaskRef.set({
         'task': title,
@@ -130,10 +109,8 @@ class TaskRealtimeDBDataSource {
         'number': currentNumber,
       });
       
-      print('Task thêm thành công!');
       return taskId;
     } catch (e) {
-      print('LỖI KHI THÊM TASK: $e');
       rethrow;
     }
   }
@@ -156,22 +133,16 @@ class TaskRealtimeDBDataSource {
         updates['date'] = date.millisecondsSinceEpoch;
       }
       
-      print('Đang cập nhật task $id với: $updates');
       await _userTasksRef.child(id).update(updates);
-      print('Task cập nhật thành công');
     } catch (e) {
-      print('Lỗi cập nhật task: $e');
       rethrow;
     }
   }
 
   Future<void> deleteTask(String id) async {
     try {
-      print('Đang xóa task: $id');
       await _userTasksRef.child(id).remove();
-      print('Task xóa thành công');
     } catch (e) {
-      print('Lỗi xóa task: $e');
       rethrow;
     }
   }

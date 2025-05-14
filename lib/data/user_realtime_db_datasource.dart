@@ -1,5 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_database/firebase_database.dart';
-import '../../domain/entities/user.dart';
+import '../domain/entities/user.dart';
 
 class UserRealtimeDBDataSource {
   final FirebaseDatabase _database = FirebaseDatabase.instance;
@@ -22,9 +23,12 @@ class UserRealtimeDBDataSource {
       await _usersRef.child(uid).set(userData);
       
       // Verify data was written correctly
-      await _usersRef.child(uid).get();
+      final snapshot = await _usersRef.child(uid).get();
+      if (!snapshot.exists) {
+        throw Exception('User profile was not saved properly');
+      }
     } catch (e) {
-      rethrow;
+      throw Exception('Error creating user profile: $e');
     }
   }
 
@@ -91,7 +95,7 @@ class UserRealtimeDBDataSource {
         'role': roleValue,
       });
     } catch (e) {
-      rethrow;
+      throw Exception('Error updating user role: $e');
     }
   }
 
@@ -105,7 +109,7 @@ class UserRealtimeDBDataSource {
         await _usersRef.child(uid).update(updates);
       }
     } catch (e) {
-      rethrow;
+      throw Exception('Error updating user profile: $e');
     }
   }
 } 

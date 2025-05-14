@@ -7,6 +7,12 @@ class GetUserById {
   GetUserById(this.repository);
 
   Future<User?> call(String uid) async {
-    return await repository.getUserById(uid);
+    try {
+      final result = await repository.getUserById(uid);
+      return result;
+    } catch (e) {
+      print('Lỗi khi lấy thông tin user: $e');
+      return null;
+    }
   }
 } 

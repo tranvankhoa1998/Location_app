@@ -20,7 +20,9 @@ class LocationRepositoryImpl implements LocationRepository {
     }
 
     final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
 
     return Location(
@@ -61,7 +63,9 @@ class LocationRepositoryImpl implements LocationRepository {
 
       // Lấy vị trí hiện tại (thay vì sử dụng vị trí được truyền vào)
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
       
       // Tạo dữ liệu vị trí cụ thể hơn
@@ -86,10 +90,7 @@ class LocationRepositoryImpl implements LocationRepository {
           'timestamp': DateTime.now().millisecondsSinceEpoch,
         }
       });
-      
-      print('Location updated successfully for user $userId');
     } catch (e) {
-      print('Error updating location: $e');
       throw Exception('Không thể cập nhật vị trí: $e');
     }
   }

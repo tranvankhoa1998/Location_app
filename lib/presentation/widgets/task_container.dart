@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:location_trackingv2/domain/entities/task.dart';
 
 class TaskContainer extends StatelessWidget {
   final String title;

@@ -7,10 +7,10 @@ class LocationMap extends StatefulWidget {
   final Set<Marker> markers;
 
   const LocationMap({
-    Key? key,
+    super.key,
     required this.initialPosition,
     required this.markers,
-  }) : super(key: key);
+  });
 
   @override
   State<LocationMap> createState() => _LocationMapState();

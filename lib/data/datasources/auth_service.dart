@@ -18,7 +18,6 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('Lỗi đăng nhập: $e');
       rethrow;
     }
   }
@@ -31,7 +30,6 @@ class AuthService {
         password: password,
       );
     } catch (e) {
-      print('Lỗi đăng ký: $e');
       rethrow;
     }
   }
@@ -41,7 +39,6 @@ class AuthService {
     try {
       return await _auth.signOut();
     } catch (e) {
-      print('Lỗi đăng xuất: $e');
       rethrow;
     }
   }
@@ -51,7 +48,6 @@ class AuthService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } catch (e) {
-      print('Lỗi gửi email đặt lại mật khẩu: $e');
       rethrow;
     }
   }

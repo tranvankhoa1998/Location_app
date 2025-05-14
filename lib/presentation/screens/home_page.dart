@@ -9,11 +9,8 @@ import '../screens/task_cubit.dart';
 import 'calendar_page.dart';
 import 'create_new_task_page.dart';
 import '../features/location/pages/location_map_page.dart';
-import '../features/location/cubit/location_cubit.dart';
 import '../../domain/entities/user.dart';
-import '../../domain/usecases/update_location.dart';
-import '../../domain/usecases/get_location_stream.dart';
-import '../../domain/entities/location.dart' as location_entity;
+import 'role_check_screen.dart';
 
 // Lấy GetIt instance
 final sl = GetIt.instance;
@@ -77,7 +74,9 @@ class _HomePageState extends State<HomePage> {
 
       // Lấy vị trí hiện tại
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       // Tạo dữ liệu vị trí
@@ -207,6 +206,105 @@ class _HomePageState extends State<HomePage> {
             },
           ),
         ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text(currentUser?.displayName ?? 'Người dùng'),
+              accountEmail: Text(currentUser?.email ?? ''),
+              currentAccountPicture: CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Text(
+                  (currentUser?.email?.isNotEmpty == true) 
+                      ? currentUser!.email![0].toUpperCase() 
+                      : 'U',
+                  style: TextStyle(fontSize: 24.0, color: Colors.blue),
+                ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.task),
+              title: Text('Danh sách nhiệm vụ'),
+              onTap: () {
+                Navigator.pop(context); // Đóng drawer
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.location_on),
+              title: Text('Bản đồ vị trí'),
+              onTap: () {
+                Navigator.pop(context); // Đóng drawer
+                _navigateToMapPage(context, currentUser);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.calendar_today),
+              title: Text('Lịch'),
+              onTap: () {
+                Navigator.pop(context); // Đóng drawer
+                final taskCubit = BlocProvider.of<TaskCubit>(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider.value(
+                      value: taskCubit,
+                      child: CalendarPage(),
+                    ),
+                  ),
+                );
+              },
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.security),
+              title: Text('Kiểm tra quyền'),
+              subtitle: Text('Sửa lỗi đăng nhập admin'),
+              onTap: () {
+                Navigator.pop(context); // Đóng drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const RoleCheckScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Đăng xuất'),
+              onTap: () async {
+                Navigator.pop(context); // Đóng drawer
+                // Hiển thị hộp thoại xác nhận
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Xác nhận'),
+                    content: const Text('Bạn có chắc chắn muốn đăng xuất?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Hủy'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Đăng xuất'),
+                      ),
+                    ],
+                  ),
+                );
+                if (confirm == true) {
+                  await auth.FirebaseAuth.instance.signOut();
+                  // Navigator.of(context) sẽ được xử lý bởi AuthWrapper
+                }
+              },
+            ),
+          ],
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

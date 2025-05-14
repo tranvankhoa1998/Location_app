@@ -1,13 +1,10 @@
-// lib/data/datasources/location_data_source.dart
-import 'dart:async';
-import 'package:geolocator/geolocator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import '../../domain/entities/location.dart';
+import 'package:geolocator/geolocator.dart';
+import '../domain/entities/location.dart';
 
 abstract class LocationDataSource {
   Future<Location> getCurrentLocation();
-  Stream<Location> getLocationStream();
   Future<void> saveLocation(Location location);
   Future<void> startTracking();
   Future<void> stopTracking();
@@ -20,13 +17,7 @@ class LocationDataSourceImpl implements LocationDataSource {
   // Firebase
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
-  final _locationController = StreamController<Location>.broadcast();
-
-  LocationDataSourceImpl() {
-    // Khởi tạo sẽ được xử lý riêng khi các phương thức được gọi
-    // thay vì ném lỗi trong constructor
-  }
-
+  
   @override
   Future<Location> getCurrentLocation() async {
     // Kiểm tra quyền truy cập vị trí
@@ -50,7 +41,7 @@ class LocationDataSourceImpl implements LocationDataSource {
       throw Exception('Dịch vụ vị trí bị tắt');
     }
     
-    // Lấy vị trí hiện tại sử dụng cách khuyến nghị thay vì desiredAccuracy
+    // Lấy vị trí hiện tại
     final position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
@@ -64,12 +55,7 @@ class LocationDataSourceImpl implements LocationDataSource {
       timestamp: DateTime.now(),
     );
   }
-
-  @override
-  Stream<Location> getLocationStream() {
-    return _locationController.stream;
-  }
-
+  
   @override
   Future<void> saveLocation(Location location) async {
     try {
@@ -100,7 +86,7 @@ class LocationDataSourceImpl implements LocationDataSource {
       throw Exception('Không thể lưu vị trí: $e');
     }
   }
-
+  
   @override
   Future<void> startTracking() async {
     if (_isTracking) {
@@ -132,7 +118,7 @@ class LocationDataSourceImpl implements LocationDataSource {
       throw Exception('Không thể bắt đầu theo dõi vị trí: $e');
     }
   }
-
+  
   @override
   Future<void> stopTracking() async {
     if (!_isTracking) {
@@ -147,4 +133,4 @@ class LocationDataSourceImpl implements LocationDataSource {
       throw Exception('Không thể dừng theo dõi vị trí: $e');
     }
   }
-}
+} 

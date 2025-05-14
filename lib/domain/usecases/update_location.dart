@@ -9,7 +9,9 @@ class UpdateLocation {
 
   Future<void> call(String userId) async {
     final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
 
     final location = Location(

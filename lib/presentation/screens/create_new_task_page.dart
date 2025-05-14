@@ -18,7 +18,7 @@ class _CreateNewTaskPageState extends State<CreateNewTaskPage> {
     super.initState();
     // KIỂM TRA XEM CUBIT CÓ TỒN TẠI KHÔNG
     try {
-      final cubit = BlocProvider.of<TaskCubit>(context, listen: false);
+      BlocProvider.of<TaskCubit>(context, listen: false);
       print('TaskCubit found in CreateNewTaskPage');
     } catch (e) {
       print('ERROR: TaskCubit not found in CreateNewTaskPage: $e');

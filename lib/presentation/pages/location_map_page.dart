@@ -9,9 +9,9 @@ class LocationMapPage extends StatelessWidget {
   final User user;
 
   const LocationMapPage({
-    Key? key,
+    super.key,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -53,34 +53,29 @@ class LocationMapPage extends StatelessWidget {
 
             if (state is LocationLoaded) {
               final location = state.location;
-              final hasLocation = location != null;
 
               return Column(
                 children: [
                   Expanded(
-                    child: hasLocation
-                        ? LocationMap(
-                            initialPosition: LatLng(
-                              location.latitude,
-                              location.longitude,
-                            ),
-                            markers: {
-                              Marker(
-                                markerId: MarkerId(user.id),
-                                position: LatLng(
-                                  location.latitude,
-                                  location.longitude,
-                                ),
-                                infoWindow: InfoWindow(
-                                  title: user.name,
-                                  snippet: 'Cập nhật: ${_formatDateTime(location.timestamp)}',
-                                ),
-                              ),
-                            },
-                          )
-                        : const Center(
-                            child: Text('Chưa có vị trí'),
+                    child: LocationMap(
+                      initialPosition: LatLng(
+                        location.latitude,
+                        location.longitude,
+                      ),
+                      markers: {
+                        Marker(
+                          markerId: MarkerId(user.id),
+                          position: LatLng(
+                            location.latitude,
+                            location.longitude,
                           ),
+                          infoWindow: InfoWindow(
+                            title: user.name,
+                            snippet: 'Cập nhật: ${_formatDateTime(location.timestamp)}',
+                          ),
+                        ),
+                      },
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16.0),

@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:firebase_database/firebase_database.dart';
 import '../../../../domain/entities/location.dart';
 import '../../../../domain/usecases/update_location.dart';
 import '../../../../domain/usecases/get_location_stream.dart';
@@ -79,7 +78,6 @@ class LocationCubit extends Cubit<LocationState> {
       await _updateLocation(userId);
       // Không cần emit loaded state ở đây vì stream sẽ tự động emit khi có dữ liệu mới
     } catch (e) {
-      print('Error updating location: $e');
       emit(LocationError('Không thể cập nhật vị trí: ${e.toString()}'));
     }
   }
@@ -106,18 +104,14 @@ class LocationCubit extends Cubit<LocationState> {
               emit(LocationInitial());
             }
           } catch (e) {
-            print('Error parsing location data: $e');
-            print('Data received: ${event.snapshot.value}');
             emit(LocationError('Lỗi xử lý dữ liệu vị trí: ${e.toString()}'));
           }
         },
         onError: (error) {
-          print('Location stream error: $error');
           emit(LocationError('Lỗi nhận dữ liệu vị trí: ${error.toString()}'));
         },
       );
     } catch (e) {
-      print('Error setting up location stream: $e');
       emit(LocationError('Không thể thiết lập luồng vị trí: ${e.toString()}'));
     }
   }

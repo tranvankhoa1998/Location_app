@@ -16,9 +16,9 @@ class LocationMapPage extends StatefulWidget {
   final User user;
 
   const LocationMapPage({
-    Key? key,
+    super.key,
     required this.user,
-  }) : super(key: key);
+  });
 
   @override
   State<LocationMapPage> createState() => _LocationMapPageState();
@@ -260,7 +260,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
 
               if (state is LocationLoaded) {
                 final location = state.location;
-                final hasLocation = location != null;
 
                 return Column(
                   children: [
@@ -277,24 +276,20 @@ class _LocationMapPageState extends State<LocationMapPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  hasLocation 
-                                      ? 'Vị trí của bạn được cập nhật lúc ${_formatDateTime(location.timestamp)}'
-                                      : 'Bạn chưa cập nhật vị trí',
+                                  'Vị trí của bạn được cập nhật lúc ${_formatDateTime(location.timestamp)}',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.blue.shade800,
                                   ),
                                 ),
-                                if (hasLocation) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Tọa độ: ${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.blue.shade700,
-                                    ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Tọa độ: ${location.latitude.toStringAsFixed(6)}, ${location.longitude.toStringAsFixed(6)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.blue.shade700,
                                   ),
-                                ],
+                                ),
                               ],
                             ),
                           ),
@@ -304,92 +299,63 @@ class _LocationMapPageState extends State<LocationMapPage> {
                     
                     // Bản đồ
                     Expanded(
-                      child: hasLocation
-                          ? Stack(
-                              children: [
-                                LocationMap(
-                                  initialPosition: LatLng(
-                                    location.latitude,
-                                    location.longitude,
-                                  ),
-                                  markers: {
-                                    Marker(
-                                      markerId: MarkerId(widget.user.id),
-                                      position: LatLng(
-                                        location.latitude,
-                                        location.longitude,
-                                      ),
-                                      infoWindow: InfoWindow(
-                                        title: 'Vị trí của bạn',
-                                        snippet: 'Cập nhật: ${_formatDateTime(location.timestamp)}',
-                                      ),
-                                    ),
-                                  },
+                      child: Stack(
+                        children: [
+                          LocationMap(
+                            initialPosition: LatLng(
+                              location.latitude,
+                              location.longitude,
+                            ),
+                            markers: {
+                              Marker(
+                                markerId: MarkerId(widget.user.id),
+                                position: LatLng(
+                                  location.latitude,
+                                  location.longitude,
                                 ),
-                                Positioned(
-                                  top: 16,
-                                  right: 16,
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black26,
-                                          blurRadius: 4,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Icon(Icons.access_time, size: 16, color: Colors.blue),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          _formatTime(location.timestamp),
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
+                                infoWindow: InfoWindow(
+                                  title: 'Vị trí của bạn',
+                                  snippet: 'Cập nhật: ${_formatDateTime(location.timestamp)}',
                                 ),
-                              ],
-                            )
-                          : Container(
-                              padding: const EdgeInsets.all(20),
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              ),
+                            },
+                          ),
+                          Positioned(
+                            top: 16,
+                            right: 16,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(
-                                    Icons.location_off,
-                                    size: 64,
-                                    color: Colors.grey.shade400,
-                                  ),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'Chưa có thông tin vị trí',
-                                    style: TextStyle(
-                                      fontSize: 18,
+                                  Icon(Icons.access_time, size: 16, color: Colors.blue),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    _formatTime(location.timestamp),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  const Text(
-                                    'Nhấn nút bên dưới để cập nhật vị trí hiện tại của bạn',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.grey),
                                   ),
                                 ],
                               ),
                             ),
+                          ),
+                        ],
+                      ),
                     ),
                     
                     // Nút cập nhật vị trí

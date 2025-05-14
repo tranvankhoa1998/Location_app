@@ -14,7 +14,9 @@ class LocationService {
 
     // Lấy vị trí hiện tại
     final position = await Geolocator.getCurrentPosition(
-      desiredAccuracy: LocationAccuracy.high,
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+      ),
     );
 
     // Cập nhật vị trí vào Firestore

@@ -3,17 +3,13 @@ import '../../domain/entities/location.dart';
 
 class LocationModel extends Location {
   LocationModel({
-    required double latitude,
-    required double longitude,
+    required super.latitude,
+    required super.longitude,
     required double accuracy,
     required double altitude,
     required double speed,
-    required DateTime timestamp,
-  }) : super(
-          latitude: latitude,
-          longitude: longitude,
-          timestamp: timestamp,
-        );
+    required super.timestamp,
+  });
 
   factory LocationModel.fromPosition(dynamic position) {
     return LocationModel(

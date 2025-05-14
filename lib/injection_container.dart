@@ -2,7 +2,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:geolocator/geolocator.dart';
 
 // Repositories and data sources
 import 'data/datasources/task_realtime_db_datasource.dart';
@@ -42,7 +41,6 @@ Future<void> init() async {
     sl.registerLazySingleton<FirebaseDatabase>(() => FirebaseDatabase.instance);
     sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
     
-    print('Registering data sources...');
     // Data sources
     sl.registerLazySingleton<LocationDataSource>(
       () => LocationDataSourceImpl(),
@@ -54,7 +52,6 @@ Future<void> init() async {
       () => UserRealtimeDBDataSource(),
     );
     
-    print('Registering repositories...');
     // Repositories
     sl.registerLazySingleton<LocationRepository>(
       () => LocationRepositoryImpl(sl<LocationDataSource>(), sl<FirebaseDatabase>()),
@@ -66,7 +63,6 @@ Future<void> init() async {
       () => UserRepositoryImpl(sl<UserRealtimeDBDataSource>()),
     );
     
-    print('Registering use cases...');
     // Task Use cases
     sl.registerLazySingleton(() => GetTasks(sl<TaskRepository>()));
     sl.registerLazySingleton(() => AddTask(sl<TaskRepository>()));
@@ -86,7 +82,6 @@ Future<void> init() async {
     sl.registerLazySingleton(() => CreateAdminUser(sl<UserRepository>()));
     sl.registerLazySingleton(() => UpdateUserRole(sl<UserRepository>()));
     
-    print('Registering cubits...');
     // Cubits
     sl.registerFactory<LocationCubit>(
       () => LocationCubit(
@@ -104,10 +99,7 @@ Future<void> init() async {
         deleteTask: sl<DeleteTask>(),
       ),
     );
-    
-    print('Dependency injection initialized successfully');
   } catch (e) {
-    print('Error initializing dependency injection: $e');
-    rethrow; // Re-throw để biết lỗi là gì
+    rethrow;
   }
 }
