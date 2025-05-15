@@ -11,6 +11,7 @@ class UpdateTask {
     DateTime? date,
     String? description,
     int? number,
+    Map<String, dynamic>? metadata,
   }) async {
     await repository.updateTask(
       id: id,
@@ -18,6 +19,7 @@ class UpdateTask {
       date: date,
       description: description,
       number: number,
+      metadata: metadata,
     );
   }
 }

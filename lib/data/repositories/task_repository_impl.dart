@@ -21,6 +21,7 @@ class TaskRepositoryImpl implements TaskRepository {
       date: task.date,
       description: task.description,
       number: task.number,
+      metadata: task.metadata,
     );
   }
 
@@ -31,6 +32,7 @@ class TaskRepositoryImpl implements TaskRepository {
     DateTime? date,
     String? description,
     int? number,
+    Map<String, dynamic>? metadata,
   }) async {
     await dataSource.updateTask(
       id: id,
@@ -38,6 +40,7 @@ class TaskRepositoryImpl implements TaskRepository {
       date: date,
       description: description,
       number: number,
+      metadata: metadata,
     );
   }
 

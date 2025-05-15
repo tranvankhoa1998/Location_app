@@ -9,6 +9,7 @@ abstract class TaskRepository {
     DateTime? date,
     String? description,
     int? number,
+    Map<String, dynamic>? metadata,
   });
   Future<void> deleteTask(String id);
 }

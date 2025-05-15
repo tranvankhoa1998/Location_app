@@ -5,6 +5,7 @@ class Task {
   final DateTime date;
   final String? description;
   final DateTime createdAt;
+  final Map<String, dynamic>? metadata;
 
   Task({
     required this.id,
@@ -13,6 +14,7 @@ class Task {
     required this.date,
     this.description,
     DateTime? createdAt,
+    this.metadata,
   }) : createdAt = createdAt ?? DateTime.now();
 
   factory Task.fromMap(String id, Map<String, dynamic> map) {
@@ -23,6 +25,7 @@ class Task {
       date: map['date'] != null ? DateTime.fromMillisecondsSinceEpoch(map['date']) : DateTime.now(),
       description: map['description'],
       createdAt: map['createdAt'] != null ? DateTime.fromMillisecondsSinceEpoch(map['createdAt']) : DateTime.now(),
+      metadata: map['metadata'] != null ? Map<String, dynamic>.from(map['metadata']) : null,
     );
   }
 
@@ -33,6 +36,7 @@ class Task {
       'date': date.millisecondsSinceEpoch,
       'description': description,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'metadata': metadata,
     };
   }
 }

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:io';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
 import 'presentation/screens/task_cubit.dart';
@@ -12,9 +14,21 @@ import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/admin/admin_home_screen.dart';
 import 'domain/usecases/get_user_by_id.dart';
 import 'domain/entities/user.dart' as app_user;
+import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Cấu hình cho Google Maps
+  if (Platform.isAndroid) {
+    // Cấu hình đúng cách cho AndroidGoogleMapsFlutter
+    AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+    
+    // Bật chế độ debug cho maps nếu đang ở chế độ debug
+    if (kDebugMode) {
+      print('Configuring Google Maps for Android in debug mode');
+    }
+  }
   
   // Khởi tạo Firebase với DefaultFirebaseOptions
   await Firebase.initializeApp(

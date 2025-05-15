@@ -33,7 +33,27 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> updateUserProfile(String uid, {String? name, String? email}) async {
-    await dataSource.updateUserProfile(uid, name: name, email: email);
+  Future<void> updateUserProfile(
+    String uid, {
+    String? name,
+    String? email,
+    String? phoneNumber,
+    String? profession,
+    int? age,
+    String? address,
+    String? bio,
+    String? avatarUrl,
+  }) async {
+    await dataSource.updateUserProfile(
+      uid,
+      name: name,
+      email: email,
+      phoneNumber: phoneNumber,
+      profession: profession,
+      age: age,
+      address: address,
+      bio: bio,
+      avatarUrl: avatarUrl,
+    );
   }
 } 

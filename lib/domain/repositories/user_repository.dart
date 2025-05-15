@@ -6,5 +6,15 @@ abstract class UserRepository {
   Stream<List<User>> getUsersByRole(UserRole role);
   Future<void> createUserProfile(String uid, String email, {UserRole role = UserRole.user});
   Future<void> updateUserRole(String uid, UserRole role);
-  Future<void> updateUserProfile(String uid, {String? name, String? email});
+  Future<void> updateUserProfile(
+    String uid, {
+    String? name,
+    String? email,
+    String? phoneNumber,
+    String? profession,
+    int? age,
+    String? address,
+    String? bio,
+    String? avatarUrl,
+  });
 } 

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
+import 'dart:async';
 import '../../../../domain/entities/user.dart';
 import '../cubit/location_cubit.dart';
 import '../widgets/location_map.dart';
@@ -27,11 +28,32 @@ class LocationMapPage extends StatefulWidget {
 class _LocationMapPageState extends State<LocationMapPage> {
   bool _loadingPermission = false;
   String? _permissionError;
+  StreamSubscription? _locationSubscription;
+  LocationCubit? _locationCubit;
+  bool _isUpdatingLocation = false;
+  bool _createOwnCubit = false;
 
   @override
   void initState() {
     super.initState();
     _checkLocationPermission();
+  }
+
+  @override
+  void dispose() {
+    // Dọn dẹp tài nguyên
+    _locationSubscription?.cancel();
+    // Đảm bảo xử lý tất cả các lỗi tiềm ẩn khi dispose
+    try {
+      // Chỉ đóng cubit nếu chúng ta đã tạo nó, không phải từ BlocProvider
+      if (_locationCubit != null && _createOwnCubit) {
+        _locationCubit!.close(); // Đóng cubit an toàn, đã cải tiến quản lý stream bên trong
+        print('Closing LocationCubit created by this widget');
+      }
+    } catch (e) {
+      print('Error when disposing location resources: $e');
+    }
+    super.dispose();
   }
 
   // Kiểm tra quyền truy cập vị trí
@@ -82,6 +104,7 @@ class _LocationMapPageState extends State<LocationMapPage> {
 
       // Nếu có quyền, tiếp tục
       if (mounted) {
+        _createAndInitCubit(); // Tạo và khởi tạo cubit ở đây
         setState(() {
           _loadingPermission = false;
         });
@@ -92,6 +115,34 @@ class _LocationMapPageState extends State<LocationMapPage> {
         setState(() {
           _permissionError = 'Lỗi khi kiểm tra quyền vị trí: $e';
           _loadingPermission = false;
+        });
+      }
+    }
+  }
+
+  // Tạo cubit khi quyền đã được kiểm tra
+  void _createAndInitCubit() {
+    try {
+      // Tạo cubit mới và khởi tạo stream
+      _locationCubit = LocationCubit(
+        updateLocation: sl<UpdateLocation>(),
+        getLocationStream: sl<GetLocationStream>(),
+      );
+      
+      // Đánh dấu cubit này do widget tạo, để hủy đúng cách khi dispose
+      _createOwnCubit = true;
+      
+      // Bảo vệ khỏi lỗi nếu cubit không khởi tạo được
+      if (_locationCubit != null) {
+        _locationCubit!.getLocationStream(widget.user.id);
+      } else {
+        throw Exception('LocationCubit could not be initialized');
+      }
+    } catch (e) {
+      print('Error initializing location cubit: $e');
+      if (mounted) {
+        setState(() {
+          _permissionError = 'Lỗi khởi tạo: ${e.toString()}';
         });
       }
     }
@@ -143,8 +194,7 @@ class _LocationMapPageState extends State<LocationMapPage> {
                     await _checkLocationPermission();
                     if (_permissionError == null && mounted) {
                       // Nếu kiểm tra quyền thành công, làm mới LocationCubit
-                      final locationCubit = context.read<LocationCubit>();
-                      locationCubit.getLocationStream(widget.user.id);
+                      _createAndInitCubit();
                     }
                   },
                   child: const Text('Thử lại'),
@@ -158,23 +208,7 @@ class _LocationMapPageState extends State<LocationMapPage> {
 
     // Nếu có quyền, hiển thị bình thường
     return BlocProvider(
-      create: (context) {
-        try {
-          return LocationCubit(
-            updateLocation: sl<UpdateLocation>(),
-            getLocationStream: sl<GetLocationStream>(),
-          )..getLocationStream(widget.user.id);
-        } catch (e) {
-          print('Error creating LocationCubit: $e');
-          // Trả về LocationCubit với trạng thái lỗi
-          final cubit = LocationCubit(
-            updateLocation: sl<UpdateLocation>(),
-            getLocationStream: sl<GetLocationStream>(),
-          );
-          cubit.emit(LocationError('Lỗi khởi tạo: ${e.toString()}'));
-          return cubit;
-        }
-      },
+      create: (context) => _locationCubit!,
       child: Builder(
         builder: (context) => Scaffold(
           appBar: AppBar(
@@ -185,7 +219,7 @@ class _LocationMapPageState extends State<LocationMapPage> {
                 tooltip: 'Làm mới dữ liệu',
                 onPressed: () {
                   try {
-                    context.read<LocationCubit>().getLocationStream(widget.user.id);
+                    _locationCubit!.getLocationStream(widget.user.id);
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Đang làm mới dữ liệu vị trí...'),
@@ -241,7 +275,7 @@ class _LocationMapPageState extends State<LocationMapPage> {
                         label: const Text('Thử lại'),
                         onPressed: () {
                           try {
-                            context.read<LocationCubit>().getLocationStream(widget.user.id);
+                            _locationCubit!.getLocationStream(widget.user.id);
                           } catch (e) {
                             print('Error retrying location stream: $e');
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -386,22 +420,80 @@ class _LocationMapPageState extends State<LocationMapPage> {
                             ),
                           ),
                           onPressed: () {
+                            // Ngăn người dùng nhấn nhiều lần
+                            if (_isUpdatingLocation) return;
+                            
                             try {
-                              context.read<LocationCubit>().updateLocation(widget.user.id);
+                              setState(() {
+                                _isUpdatingLocation = true;
+                              });
+                              
+                              // Hiển thị SnackBar trước khi gọi API để tránh các vấn đề về timing
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Đang cập nhật vị trí...'),
                                   duration: Duration(seconds: 2),
                                 ),
                               );
+                              
+                              // Đảm bảo sử dụng Future.delayed để tránh các vấn đề UI thread
+                              Future.delayed(Duration.zero, () async {
+                                try {
+                                  // Thực hiện cập nhật với try-catch riêng
+                                  await _locationCubit!.updateLocation(widget.user.id);
+                                  
+                                  // Chỉ hiển thị thông báo thành công nếu widget vẫn mounted
+                                  if (mounted) {
+                                    setState(() {
+                                      _isUpdatingLocation = false;
+                                    });
+                                    
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Vị trí đã được cập nhật thành công'),
+                                        backgroundColor: Colors.green,
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                    
+                                    // Chờ một chút để người dùng thấy thông báo rồi quay lại
+                                    await Future.delayed(const Duration(seconds: 1));
+                                    
+                                    // Nếu widget vẫn mounted, thì quay lại trang trước đó
+                                    if (mounted) {
+                                      Navigator.of(context).pop();
+                                    }
+                                  }
+                                } catch (e) {
+                                  print('Error updating location: $e');
+                                  if (mounted) {
+                                    setState(() {
+                                      _isUpdatingLocation = false;
+                                    });
+                                    
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('Lỗi: ${e.toString()}'),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                }
+                              });
                             } catch (e) {
-                              print('Error updating location: $e');
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Lỗi: ${e.toString()}'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
+                              print('Critical error on button press: $e');
+                              if (mounted) {
+                                setState(() {
+                                  _isUpdatingLocation = false;
+                                });
+                                
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Lỗi nghiêm trọng: ${e.toString()}'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
                             }
                           },
                         ),

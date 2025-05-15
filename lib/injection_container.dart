@@ -32,6 +32,7 @@ import 'domain/usecases/update_user_role.dart';
 // Cubits
 import 'presentation/screens/task_cubit.dart';
 import 'presentation/features/location/cubit/location_cubit.dart';
+import 'presentation/features/location/cubit/tracking_cubit.dart';
 
 final sl = GetIt.instance;
 
@@ -87,6 +88,12 @@ Future<void> init() async {
       () => LocationCubit(
         updateLocation: sl<UpdateLocation>(),
         getLocationStream: sl<GetLocationStream>(),
+      ),
+    );
+    
+    sl.registerFactory<TrackingCubit>(
+      () => TrackingCubit(
+        toggleTracking: sl<ToggleTracking>(),
       ),
     );
     

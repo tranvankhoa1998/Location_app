@@ -50,12 +50,19 @@ class TaskRealtimeDBDataSource {
                 taskDate = DateTime.now();
               }
               
+              // Lấy metadata nếu có
+              Map<String, dynamic>? metadata;
+              if (taskData['metadata'] != null && taskData['metadata'] is Map) {
+                metadata = Map<String, dynamic>.from(taskData['metadata'] as Map);
+              }
+              
               return TaskModel(
                 id: entry.key as String,
                 task: taskData['task'] ?? '',
                 number: taskData['number'] ?? 0,
                 date: taskDate,
                 description: taskData['description'],
+                metadata: metadata,
               );
             } catch (e) {
               return null;
@@ -81,6 +88,7 @@ class TaskRealtimeDBDataSource {
     required DateTime date,
     String? description,
     int number = 0,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       // Lấy số task hiện tại để tính toán số thứ tự mới
@@ -107,6 +115,7 @@ class TaskRealtimeDBDataSource {
         'date': date.millisecondsSinceEpoch,
         'description': description,
         'number': currentNumber,
+        if (metadata != null) 'metadata': metadata,
       });
       
       return taskId;
@@ -121,6 +130,7 @@ class TaskRealtimeDBDataSource {
     DateTime? date,
     String? description,
     int? number,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       final updates = <String, dynamic>{};
@@ -128,6 +138,7 @@ class TaskRealtimeDBDataSource {
       if (title != null) updates['task'] = title;
       if (description != null) updates['description'] = description;
       if (number != null) updates['number'] = number;
+      if (metadata != null) updates['metadata'] = metadata;
       
       if (date != null) {
         updates['date'] = date.millisecondsSinceEpoch;
@@ -146,4 +157,4 @@ class TaskRealtimeDBDataSource {
       rethrow;
     }
   }
-}
+} 

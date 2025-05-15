@@ -6,6 +6,7 @@ class TaskModel {
   final int number;
   final DateTime date;
   final String? description;
+  final Map<String, dynamic>? metadata;
 
   TaskModel({
     required this.id,
@@ -13,6 +14,7 @@ class TaskModel {
     required this.number,
     required this.date,
     this.description,
+    this.metadata,
   });
 
   factory TaskModel.fromJson(Map<String, dynamic> json) {
@@ -26,12 +28,18 @@ class TaskModel {
       dateTime = DateTime.now();
     }
     
+    Map<String, dynamic>? metadata;
+    if (json['metadata'] != null && json['metadata'] is Map) {
+      metadata = Map<String, dynamic>.from(json['metadata'] as Map);
+    }
+    
     return TaskModel(
       id: json['id'] ?? '',
       task: json['task'] ?? '',
       number: json['number'] ?? 0,
       date: dateTime,
       description: json['description'],
+      metadata: metadata,
     );
   }
 
@@ -41,6 +49,7 @@ class TaskModel {
       'number': number,
       'date': date.millisecondsSinceEpoch,
       'description': description,
+      if (metadata != null) 'metadata': metadata,
     };
   }
 
@@ -51,6 +60,7 @@ class TaskModel {
       number: number,
       date: date,
       description: description,
+      metadata: metadata,
     );
   }
 }

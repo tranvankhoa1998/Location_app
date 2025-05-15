@@ -49,6 +49,7 @@ class TaskCubit extends Cubit<List<Task>> {
     required String title,
     required DateTime date,
     String? description,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       final newTask = Task(
@@ -57,6 +58,7 @@ class TaskCubit extends Cubit<List<Task>> {
         date: date,
         description: description,
         number: state.length + 1,  // Số task tiếp theo
+        metadata: metadata,
       );
       
       await _addTask(newTask);
@@ -71,6 +73,7 @@ class TaskCubit extends Cubit<List<Task>> {
     DateTime? date,
     String? description,
     int? number,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       await _updateTask(
@@ -79,6 +82,7 @@ class TaskCubit extends Cubit<List<Task>> {
         date: date,
         description: description,
         number: number,
+        metadata: metadata,
       );
     } catch (e) {
       print('Lỗi cập nhật task: $e');

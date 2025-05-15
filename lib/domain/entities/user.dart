@@ -11,6 +11,12 @@ class User {
   final String email;
   final UserRole role;
   final Location? location;
+  final String? phoneNumber;
+  final String? profession;
+  final int? age;
+  final String? address;
+  final String? bio;
+  final String? avatarUrl;
 
   User({
     required this.id,
@@ -18,6 +24,12 @@ class User {
     required this.email,
     required this.role,
     this.location,
+    this.phoneNumber,
+    this.profession,
+    this.age,
+    this.address,
+    this.bio,
+    this.avatarUrl,
   });
 
   factory User.fromMap(String id, Map<String, dynamic> data) {
@@ -52,6 +64,12 @@ class User {
         email: data['email'] ?? '',
         role: userRole,
         location: userLocation,
+        phoneNumber: data['phoneNumber'],
+        profession: data['profession'],
+        age: data['age'] is int ? data['age'] : (data['age'] != null ? int.tryParse(data['age'].toString()) : null),
+        address: data['address'],
+        bio: data['bio'],
+        avatarUrl: data['avatarUrl'],
       );
     } catch (e) {
       // Return a minimal valid user to avoid null issues
@@ -71,6 +89,12 @@ class User {
       'email': email,
       'role': role.toString().split('.').last,
       if (location != null) 'lastLocation': location!.toMap(),
+      if (phoneNumber != null) 'phoneNumber': phoneNumber,
+      if (profession != null) 'profession': profession,
+      if (age != null) 'age': age,
+      if (address != null) 'address': address,
+      if (bio != null) 'bio': bio,
+      if (avatarUrl != null) 'avatarUrl': avatarUrl,
     };
   }
 } 

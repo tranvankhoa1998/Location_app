@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:async';
+import 'dart:io';
 
 class LocationMap extends StatefulWidget {
   final LatLng initialPosition;
@@ -21,6 +22,69 @@ class _LocationMapState extends State<LocationMap> {
   bool _mapLoaded = false;
   bool _mapError = false;
   String _errorMessage = '';
+  bool _userMovedCamera = false; // Theo dõi xem người dùng có tự di chuyển camera không
+  
+  // Các BehaviorSubject để theo dõi sự kiện di chuyển camera
+  CameraPosition? _lastCameraPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    // Chú ý: dòng này gây lỗi vì AndroidGoogleMapsFlutter không có sẵn
+    // thay vào đó, chúng ta sẽ cài đặt trong main.dart
+    // if (Platform.isAndroid) {
+    //   AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
+    // }
+  }
+
+  @override
+  void didUpdateWidget(LocationMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    
+    // Nếu vị trí ban đầu thay đổi và người dùng chưa tự di chuyển camera, cập nhật camera
+    if (oldWidget.initialPosition != widget.initialPosition && !_userMovedCamera) {
+      _updateCameraPosition(widget.initialPosition);
+    }
+    
+    // Nếu markers thay đổi, cập nhật UI
+    if (oldWidget.markers != widget.markers) {
+      if (mounted) {
+        setState(() {});
+      }
+    }
+  }
+
+  // Phương thức để cập nhật vị trí camera
+  Future<void> _updateCameraPosition(LatLng position) async {
+    if (_controller.isCompleted) {
+      try {
+        final controller = await _controller.future;
+        controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: position,
+              zoom: 15,
+            ),
+          ),
+        );
+      } catch (e) {
+        print('Error updating camera position: $e');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    // Xử lý giải phóng tài nguyên khi widget bị hủy
+    if (_controller.isCompleted) {
+      _controller.future.then((controller) {
+        controller.dispose();
+      }).catchError((e) {
+        print('Error disposing map controller: $e');
+      });
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,24 +138,35 @@ class _LocationMapState extends State<LocationMap> {
           myLocationButtonEnabled: true,
           zoomControlsEnabled: true,
           mapToolbarEnabled: true,
+          compassEnabled: true,
+          mapType: MapType.normal,
+          // Giảm thiểu lỗi EGL bằng cách sử dụng LiteMode trên máy ảo
+          liteModeEnabled: Platform.isAndroid && false, // Tắt lite mode
+          trafficEnabled: false, // Tắt hiển thị giao thông
+          buildingsEnabled: true, // Bật hiển thị tòa nhà
+          indoorViewEnabled: false, // Tắt chế độ xem trong nhà
           onMapCreated: (GoogleMapController controller) {
             try {
               if (!_controller.isCompleted) {
                 _controller.complete(controller);
               }
-              setState(() {
-                _mapLoaded = true;
-              });
+              if (mounted) {
+                setState(() {
+                  _mapLoaded = true;
+                });
+              }
             } catch (e) {
               print('Error completing map controller: $e');
-              setState(() {
-                _mapError = true;
-                _errorMessage = 'Lỗi khi tạo bản đồ: ${e.toString()}';
-              });
+              if (mounted) {
+                setState(() {
+                  _mapError = true;
+                  _errorMessage = 'Lỗi khi tạo bản đồ: ${e.toString()}';
+                });
+              }
             }
           },
           onCameraMove: (_) {
-            // Chỉ để bắt lỗi
+            // Bắt lỗi khi di chuyển camera
             try {
               // Không làm gì
             } catch (e) {

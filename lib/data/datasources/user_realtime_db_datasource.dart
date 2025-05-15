@@ -95,11 +95,27 @@ class UserRealtimeDBDataSource {
     }
   }
 
-  Future<void> updateUserProfile(String uid, {String? name, String? email}) async {
+  Future<void> updateUserProfile(
+    String uid, {
+    String? name,
+    String? email,
+    String? phoneNumber,
+    String? profession,
+    int? age,
+    String? address,
+    String? bio,
+    String? avatarUrl,
+  }) async {
     try {
       final updates = <String, dynamic>{};
       if (name != null) updates['name'] = name;
       if (email != null) updates['email'] = email;
+      if (phoneNumber != null) updates['phoneNumber'] = phoneNumber;
+      if (profession != null) updates['profession'] = profession;
+      if (age != null) updates['age'] = age;
+      if (address != null) updates['address'] = address;
+      if (bio != null) updates['bio'] = bio;
+      if (avatarUrl != null) updates['avatarUrl'] = avatarUrl;
       
       if (updates.isNotEmpty) {
         await _usersRef.child(uid).update(updates);
