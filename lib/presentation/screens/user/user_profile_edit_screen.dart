@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:get_it/get_it.dart';
-import '../../domain/repositories/user_repository.dart';
-import '../../domain/entities/user.dart' as app_user;
+import '../../../domain/repositories/user_repository.dart';
+import '../../../domain/entities/user.dart' as app_user;
 
 class UserProfileEditScreen extends StatefulWidget {
   final String userId;

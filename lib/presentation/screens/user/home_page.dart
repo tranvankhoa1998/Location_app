@@ -4,18 +4,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_it/get_it.dart';
-import '../screens/task_list.dart';
-import '../screens/task_cubit.dart';        
+import 'task_list.dart';
+import '../../features/location/cubit/task_cubit.dart';        
 import 'calendar_page.dart';
 import 'create_new_task_page.dart';
-import '../features/location/pages/location_map_page.dart';
-import '../../domain/entities/user.dart' as app_user;
-import 'role_check_screen.dart';
+import '../../features/location/pages/location_map_page.dart';
+import '../../../domain/entities/user.dart' as app_user;
+import '../role_check_screen.dart';
 import 'user_profile_edit_screen.dart';
-import '../../domain/repositories/user_repository.dart';
-import '../features/location/cubit/tracking_cubit.dart';
-import '../common/widgets/gradient_card.dart';
-import '../common/widgets/animated_avatar.dart';
+import '../../../domain/repositories/user_repository.dart';
+import '../../features/location/cubit/tracking_cubit.dart';
+import '../../common/widgets/gradient_card.dart';
+import '../../common/widgets/animated_avatar.dart';
 
 // Lấy GetIt instance
 final sl = GetIt.instance;

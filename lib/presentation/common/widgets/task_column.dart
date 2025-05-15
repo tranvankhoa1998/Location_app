@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/task.dart';
+import '../../../domain/entities/task.dart';
 
 class TaskColumn extends StatelessWidget {
   final IconData icon; // Vẫn giữ tham số này để không phải thay đổi các chỗ gọi

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../screens/task_cubit.dart';
-import '../../domain/entities/task.dart';
-import '../widgets/back_button.dart';
+import '../../features/location/cubit/task_cubit.dart';
+import '../../../domain/entities/task.dart';
+import '../../common/widgets/back_button.dart';
 
 class CalendarPage extends StatefulWidget {
   @override

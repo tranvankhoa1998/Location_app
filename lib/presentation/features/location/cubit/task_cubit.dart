@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/entities/task.dart';
-import '../../domain/usecases/add_task.dart';
-import '../../domain/usecases/delete_task.dart';
-import '../../domain/usecases/get_tasks.dart';
-import '../../domain/usecases/update_task.dart';
+import '../../../../domain/entities/task.dart';
+import '../../../../domain/usecases/add_task.dart';
+import '../../../../domain/usecases/delete_task.dart';
+import '../../../../domain/usecases/get_tasks.dart';
+import '../../../../domain/usecases/update_task.dart';
 
 class TaskCubit extends Cubit<List<Task>> {
   final GetTasks _getTasks;

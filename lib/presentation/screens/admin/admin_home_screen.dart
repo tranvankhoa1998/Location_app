@@ -5,7 +5,7 @@ import 'user_list_screen.dart';
 import 'user_role_management_screen.dart';
 import 'overall_map_screen.dart';
 import '../../../domain/usecases/get_users_by_role.dart';
-import '../login_screen.dart';
+import '../user/login_screen.dart';
 import 'user_distance_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'admin_profile_screen.dart';

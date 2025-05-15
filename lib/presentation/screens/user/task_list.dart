@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import '../../domain/entities/task.dart';
-import '../screens/task_cubit.dart';
-import '../common/widgets/animated_task_card.dart';
+import '../../../domain/entities/task.dart';
+import '../../features/location/cubit/task_cubit.dart';
+import '../../common/widgets/animated_task_card.dart';
 
 class TaskList extends StatelessWidget {
   @override

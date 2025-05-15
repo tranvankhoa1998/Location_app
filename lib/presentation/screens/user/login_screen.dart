@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:get_it/get_it.dart';
-import '../screens/home_page.dart';
-import 'admin/admin_home_screen.dart';
-import '../../domain/usecases/get_user_by_id.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/repositories/user_repository.dart';
+import 'home_page.dart';
+import '../admin/admin_home_screen.dart';
+import '../../../domain/usecases/get_user_by_id.dart';
+import '../../../domain/entities/user.dart';
+import '../../../domain/repositories/user_repository.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/task.dart';
+import '../../../domain/entities/task.dart';
 
 class ActiveProjectCard extends StatelessWidget {
   final Color cardColor;
