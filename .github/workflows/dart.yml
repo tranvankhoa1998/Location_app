@@ -64,15 +64,3 @@ jobs:
       # Bước 8: Build debug APK để kiểm tra
       - name: Build APK (Debug)
         run: flutter build apk --debug
-
-      # Bước 9: Thông báo kết quả qua Slack (tùy chọn)
-      - name: Slack Notification
-        if: always()  # Chạy bất kể thành công hay thất bại
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_CHANNEL: '#security-alerts'
-          SLACK_COLOR: ${{ job.status }}  # Màu sẽ thay đổi theo trạng thái
-          SLACK_TITLE: 'Security Scan Results'
-          SLACK_MESSAGE: 'Security scan completed for Location_app'
-          SLACK_FOOTER: 'Powered by GitHub Actions'
