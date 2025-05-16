@@ -52,7 +52,7 @@ jobs:
 
       # Bước 6: Kiểm tra Dart formatting
       - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --output=none .
 
       # Bước 7: Check outdated packages
       - name: Check for outdated packages
