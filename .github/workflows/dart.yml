@@ -36,13 +36,14 @@ jobs:
           extra_args: --debug --only-verified
 
       # Bước 3: Snyk - Kiểm tra dependencies
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/dart@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-          command: monitor
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Authenticate Snyk
+        run: snyk auth ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk test (Dart/Flutter)
+        run: snyk test --all-projects --severity-threshold=high
 
       # Bước 4: Flutter static analysis
       - name: Run Flutter analyze
