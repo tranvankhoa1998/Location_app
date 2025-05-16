@@ -10,7 +10,6 @@ import 'calendar_page.dart';
 import 'create_new_task_page.dart';
 import '../../features/location/pages/location_map_page.dart';
 import '../../../domain/entities/user.dart' as app_user;
-import '../role_check_screen.dart';
 import 'user_profile_edit_screen.dart';
 import '../../../domain/repositories/user_repository.dart';
 import '../../features/location/cubit/tracking_cubit.dart';
@@ -64,7 +63,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
     } catch (e) {
-      print('Error checking last location update: $e');
+      // Error silently ignored in production
     }
   }
 
@@ -117,7 +116,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               } catch (e) {
-                print('Error navigating to calendar page: $e');
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Lỗi khi mở trang lịch: ${e.toString()}'),
@@ -223,31 +221,6 @@ class _HomePageState extends State<HomePage> {
                     builder: (context) => UserProfileEditScreen(userId: currentUser?.uid ?? ''),
                   ),
                 );
-              },
-            ),
-            FutureBuilder<app_user.User?>(
-              future: _getUserData(currentUser?.uid ?? ''),
-              builder: (context, snapshot) {
-                // Chỉ hiển thị option quản lý người dùng nếu là admin
-                if (snapshot.hasData && 
-                    snapshot.data != null && 
-                    snapshot.data!.role == app_user.UserRole.admin) {
-                  return ListTile(
-                    leading: Icon(Icons.admin_panel_settings),
-                    title: Text('Quản lý người dùng'),
-                    subtitle: Text('Dành cho quản trị viên'),
-                    onTap: () {
-                      Navigator.pop(context); // Đóng drawer
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RoleCheckScreen(),
-                        ),
-                      );
-                    },
-                  );
-                }
-                return const SizedBox.shrink(); // Ẩn nếu không phải admin
               },
             ),
             ListTile(
@@ -659,14 +632,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<app_user.User?> _getUserData(String uid) async {
-    if (uid.isEmpty) return null;
+  Future<app_user.User?> _getUserData(String userId) async {
+    if (userId.isEmpty) return null;
     
     try {
-      final userRepo = GetIt.instance<UserRepository>();
-      return await userRepo.getUserById(uid);
+      final userRepository = sl<UserRepository>();
+      return await userRepository.getUserById(userId);
     } catch (e) {
-      print('Error fetching user data: $e');
+      // Error silently ignored in production
       return null;
     }
   }

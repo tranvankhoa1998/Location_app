@@ -86,22 +86,6 @@ class _UserListScreenState extends State<UserListScreen> {
                     key: ValueKey(DateTime.now().toString()),
                     stream: widget.getUsersByRole(UserRole.user),
                     builder: (context, snapshot) {
-                      // Print debug info
-                      print('StreamBuilder state: ${snapshot.connectionState}');
-                      print('Has error: ${snapshot.hasError}');
-                      if (snapshot.hasError) {
-                        print('Error: ${snapshot.error}');
-                      }
-                      print('Has data: ${snapshot.hasData}');
-                      if (snapshot.hasData) {
-                        print('Data length: ${snapshot.data?.length}');
-                        if (snapshot.data != null) {
-                          for (var user in snapshot.data!) {
-                            print('User in list: ${user.id} (${user.name}, ${user.email})');
-                          }
-                        }
-                      }
-                      
                       if (snapshot.hasError) {
                         return Center(
                           child: Column(

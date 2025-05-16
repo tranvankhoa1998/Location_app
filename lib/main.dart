@@ -14,7 +14,6 @@ import 'presentation/screens/user/login_screen.dart';
 import 'presentation/screens/admin/admin_home_screen.dart';
 import 'domain/usecases/get_user_by_id.dart';
 import 'domain/entities/user.dart' as app_user;
-import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,11 +22,6 @@ void main() async {
   if (Platform.isAndroid) {
     // Cấu hình đúng cách cho AndroidGoogleMapsFlutter
     AndroidGoogleMapsFlutter.useAndroidViewSurface = true;
-    
-    // Bật chế độ debug cho maps nếu đang ở chế độ debug
-    if (kDebugMode) {
-      print('Configuring Google Maps for Android in debug mode');
-    }
   }
   
   // Khởi tạo Firebase với DefaultFirebaseOptions

@@ -48,10 +48,9 @@ class _LocationMapPageState extends State<LocationMapPage> {
       // Chỉ đóng cubit nếu chúng ta đã tạo nó, không phải từ BlocProvider
       if (_locationCubit != null && _createOwnCubit) {
         _locationCubit!.close(); // Đóng cubit an toàn, đã cải tiến quản lý stream bên trong
-        print('Closing LocationCubit created by this widget');
       }
     } catch (e) {
-      print('Error when disposing location resources: $e');
+      // Error silently ignored in production
     }
     super.dispose();
   }
@@ -110,7 +109,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
         });
       }
     } catch (e) {
-      print('Error checking location permission: $e');
       if (mounted) {
         setState(() {
           _permissionError = 'Lỗi khi kiểm tra quyền vị trí: $e';
@@ -139,7 +137,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
         throw Exception('LocationCubit could not be initialized');
       }
     } catch (e) {
-      print('Error initializing location cubit: $e');
       if (mounted) {
         setState(() {
           _permissionError = 'Lỗi khởi tạo: ${e.toString()}';
@@ -227,7 +224,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
                       ),
                     );
                   } catch (e) {
-                    print('Error refreshing location data: $e');
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Lỗi: ${e.toString()}'),
@@ -277,7 +273,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
                           try {
                             _locationCubit!.getLocationStream(widget.user.id);
                           } catch (e) {
-                            print('Error retrying location stream: $e');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Lỗi: ${e.toString()}'),
@@ -465,7 +460,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
                                     }
                                   }
                                 } catch (e) {
-                                  print('Error updating location: $e');
                                   if (mounted) {
                                     setState(() {
                                       _isUpdatingLocation = false;
@@ -481,7 +475,6 @@ class _LocationMapPageState extends State<LocationMapPage> {
                                 }
                               });
                             } catch (e) {
-                              print('Critical error on button press: $e');
                               if (mounted) {
                                 setState(() {
                                   _isUpdatingLocation = false;
