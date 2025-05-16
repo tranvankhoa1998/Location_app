@@ -1,0 +1,77 @@
+name: Flutter Security Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Cần thiết cho TruffleHog để quét lịch sử commit
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.0'  # Điều chỉnh version Flutter theo project của bạn
+          channel: 'stable'
+
+      # Bước 1: Cài đặt dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Bước 2: Kiểm tra code với TruffleHog
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --debug --only-verified
+
+      # Bước 3: Snyk - Kiểm tra dependencies
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/actions/dart@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+          command: monitor
+
+      # Bước 4: Flutter static analysis
+      - name: Run Flutter analyze
+        run: flutter analyze
+
+      # Bước 5: Flutter test
+      - name: Run Flutter test
+        run: flutter test
+
+      # Bước 6: Kiểm tra Dart formatting
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      # Bước 7: Check outdated packages
+      - name: Check for outdated packages
+        run: flutter pub outdated
+
+      # Bước 8: Build debug APK để kiểm tra
+      - name: Build APK (Debug)
+        run: flutter build apk --debug
+
+      # Bước 9: Thông báo kết quả qua Slack (tùy chọn)
+      - name: Slack Notification
+        if: always()  # Chạy bất kể thành công hay thất bại
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_CHANNEL: '#security-alerts'
+          SLACK_COLOR: ${{ job.status }}  # Màu sẽ thay đổi theo trạng thái
+          SLACK_TITLE: 'Security Scan Results'
+          SLACK_MESSAGE: 'Security scan completed for Location_app'
+          SLACK_FOOTER: 'Powered by GitHub Actions'
