@@ -15,7 +15,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Cần thiết cho TruffleHog để quét lịch sử commit
-
+      - name: Remove Flutter cache
+        run: rm -rf /opt/hostedtoolcache/flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
