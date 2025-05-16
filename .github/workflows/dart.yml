@@ -1,0 +1,63 @@
+name: Flutter Security Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  security-checks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Cần thiết cho TruffleHog để quét lịch sử commit
+      - name: Remove Flutter cache
+        run: rm -rf /opt/hostedtoolcache/flutter
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.2'  # Điều chỉnh version Flutter theo project của bạn
+          channel: 'stable'
+
+      # Bước 1: Cài đặt dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Bước 2: Kiểm tra code với TruffleHog
+      - name: TruffleHog Secret Scan (Filesystem)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          scanArguments: filesystem --path=.
+
+      # Bước 3: Snyk - Kiểm tra dependencies
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
+      - name: Snyk test (Dart/Flutter)
+        run: snyk test --all-projects --severity-threshold=high
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      # Bước 4: Flutter static analysis
+      - name: Run Flutter analyze
+        run: flutter analyze
+
+      # Bước 5: Flutter test
+      - name: Run Flutter test
+        run: flutter test
+
+      # Bước 6: Kiểm tra Dart formatting
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      # Bước 7: Check outdated packages
+      - name: Check for outdated packages
+        run: flutter pub outdated
+
+      # Bước 8: Build debug APK để kiểm tra
+      - name: Build APK (Debug)
+        run: flutter build apk --debug
