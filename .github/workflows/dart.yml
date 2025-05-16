@@ -19,7 +19,7 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.19.0'  # Điều chỉnh version Flutter theo project của bạn
+          flutter-version: '3.7.2'  # Điều chỉnh version Flutter theo project của bạn
           channel: 'stable'
 
       # Bước 1: Cài đặt dependencies
