@@ -1,7 +1,6 @@
 import 'location.dart';
 
 enum UserRole {
-  admin,
   user,
 }
 
@@ -33,8 +32,7 @@ class User {
   });
 
   factory User.fromMap(String id, Map<String, dynamic> data) {
-    try {
-      // Xác định quyền từ chuỗi
+    try {      // Xác định quyền từ chuỗi
       UserRole userRole = UserRole.user; // Mặc định là user
       
       // Lấy giá trị role từ dữ liệu, chuyển sang chữ thường và trim
@@ -43,10 +41,8 @@ class User {
         roleStr = data['role'].toString().toLowerCase().trim();
       }
       
-      // Chỉ đặt là admin nếu role chính xác là "admin"
-      if (roleStr == 'admin') {
-        userRole = UserRole.admin;
-      }
+      // Tất cả người dùng đều có role user
+      // (Admin sẽ được quản lý ở nền tảng khác)
       
       // Handle optional location data
       Location? userLocation;

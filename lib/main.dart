@@ -11,9 +11,6 @@ import 'presentation/features/location/cubit/task_cubit.dart';
 import 'presentation/features/location/cubit/location_cubit.dart';
 import 'presentation/screens/user/home_page.dart';
 import 'presentation/screens/user/login_screen.dart';
-import 'presentation/screens/admin/admin_home_screen.dart';
-import 'domain/usecases/get_user_by_id.dart';
-import 'domain/entities/user.dart' as app_user;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -70,24 +67,8 @@ class AuthWrapper extends StatelessWidget {
         }
         
         if (snapshot.hasData && snapshot.data != null) {
-          // Người dùng đã đăng nhập - trả về FutureBuilder để kiểm tra vai trò
-          return FutureBuilder<app_user.User?>(
-            future: di.sl<GetUserById>()(snapshot.data!.uid),
-            builder: (context, userSnapshot) {
-              if (userSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              // Kiểm tra role và chuyển hướng đến màn hình phù hợp
-              if (userSnapshot.hasData && 
-                  userSnapshot.data != null && 
-                  userSnapshot.data!.role == app_user.UserRole.admin) {
-                return const AdminHomeScreen();
-              } else {
-                return HomePage();
-              }
-            },
-          );
+          // Người dùng đã đăng nhập - chuyển đến trang home
+          return HomePage();
         } else {
           // Người dùng chưa đăng nhập
           return const LoginScreen();

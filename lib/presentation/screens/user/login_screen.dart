@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:get_it/get_it.dart';
 import 'home_page.dart';
-import '../admin/admin_home_screen.dart';
 import '../../../domain/usecases/get_user_by_id.dart';
 import '../../../domain/entities/user.dart';
 import '../../../domain/repositories/user_repository.dart';
@@ -20,42 +19,13 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _isLogin = true; // true = đăng nhập, false = đăng ký
   
-  final _auth = auth.FirebaseAuth.instance;
-  final _getUserById = GetIt.instance<GetUserById>();
+  final _auth = auth.FirebaseAuth.instance;  final _getUserById = GetIt.instance<GetUserById>();
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  // Hàm này cố gắng sửa quyền admin cho người dùng nếu cần
-  Future<void> _fixAdminRole(String uid, String email) async {
-    try {
-      // Danh sách email admin mặc định - CHỈ những email này mới có quyền admin
-      final adminEmails = [
-        'admin@example.com',
-        'khoa123123@gmail.com',
-        // Thêm email admin thật của bạn vào đây
-      ];
-      
-      if (adminEmails.contains(email.toLowerCase())) {
-        // Cập nhật quyền trong database
-        final userRepo = GetIt.instance<UserRepository>();
-        await userRepo.updateUserRole(uid, UserRole.admin);
-      } else {
-        // Đảm bảo user có quyền USER (không phải ADMIN)
-        final userRepo = GetIt.instance<UserRepository>();
-        final user = await _getUserById(uid);
-        
-        if (user != null && user.role == UserRole.admin) {
-          await userRepo.updateUserRole(uid, UserRole.user);
-        }
-      }
-    } catch (e) {
-      print('Lỗi khi kiểm tra/sửa quyền admin: $e');
-    }
   }
 
   Future<void> _authenticate() async {
@@ -81,28 +51,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final userCredential = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
-        );
-
-        if (userCredential.user != null) {
-          // Thử sửa quyền admin
-          await _fixAdminRole(userCredential.user!.uid, email);
-          
-          // Kiểm tra quyền của người dùng
-          final user = await _getUserById(userCredential.user!.uid);
-          
-          if (!mounted) return; // Kiểm tra trước khi sử dụng context
-          
-          if (user != null && user.role == UserRole.admin) {
-            // Nếu là admin, chuyển đến màn hình admin
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => const AdminHomeScreen()),
-            );
-          } else {
-            // Nếu là user thường, chuyển đến màn hình home
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) => HomePage()),
-            );
-          }
+        );        if (userCredential.user != null) {
+          // Chuyển đến màn hình home
+          if (!mounted) return;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
         }
       } else {
         // Đăng ký tài khoản thường
@@ -118,11 +72,9 @@ class _LoginScreenState extends State<LoginScreen> {
             // Tạo profile người dùng
             final userRepo = GetIt.instance<UserRepository>();
             try {
-              print('Creating user profile in database...');
-              await userRepo.createUserProfile(
+              print('Creating user profile in database...');              await userRepo.createUserProfile(
                 userCredential.user!.uid,
                 email,
-                role: UserRole.user,
               );
               print('User profile created in database');
               

@@ -77,19 +77,8 @@ class LocationRepositoryImpl implements LocationRepository {
         'speed': position.speed,
         'heading': position.heading,
         'timestamp': DateTime.now().millisecondsSinceEpoch,
-      };
-
-      // Lưu vị trí vào Realtime Database
+      };      // Lưu vị trí vào Realtime Database
       await _database.ref().child('locations').child(userId).set(locationData);
-      
-      // Cập nhật lastLocation trong user profile
-      await _database.ref().child('users').child(userId).update({
-        'lastLocation': {
-          'latitude': position.latitude,
-          'longitude': position.longitude,
-          'timestamp': DateTime.now().millisecondsSinceEpoch,
-        }
-      });
     } catch (e) {
       throw Exception('Không thể cập nhật vị trí: $e');
     }

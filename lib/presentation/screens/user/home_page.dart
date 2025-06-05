@@ -15,6 +15,7 @@ import '../../../domain/repositories/user_repository.dart';
 import '../../features/location/cubit/tracking_cubit.dart';
 import '../../common/widgets/gradient_card.dart';
 import '../../common/widgets/animated_avatar.dart';
+import '../test/location_test_screen.dart';
 
 // Lấy GetIt instance
 final sl = GetIt.instance;
@@ -38,7 +39,6 @@ class _HomePageState extends State<HomePage> {
       _checkLastLocationUpdate();
     });
   }
-
   // Kiểm tra thời gian cập nhật vị trí cuối nếu có
   Future<void> _checkLastLocationUpdate() async {
     try {
@@ -46,9 +46,8 @@ class _HomePageState extends State<HomePage> {
       if (currentUser != null && mounted) {
         final ref = FirebaseDatabase.instance
           .ref()
-          .child('users')
-          .child(currentUser.uid)
-          .child('lastLocation');
+          .child('locations')
+          .child(currentUser.uid);
         
         final snapshot = await ref.get();
         if (snapshot.exists && snapshot.value != null) {
@@ -190,8 +189,7 @@ class _HomePageState extends State<HomePage> {
                 Navigator.pop(context); // Đóng drawer
                 _navigateToMapPage(context, currentUser);
               },
-            ),
-            ListTile(
+            ),            ListTile(
               leading: Icon(Icons.calendar_today),
               title: Text('Lịch'),
               onTap: () {
@@ -204,6 +202,20 @@ class _HomePageState extends State<HomePage> {
                       value: taskCubit,
                       child: CalendarPage(),
                     ),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.bug_report, color: Colors.orange),
+              title: Text('Test Location & Map'),
+              subtitle: Text('Test GPS và hiển thị bản đồ'),
+              onTap: () {
+                Navigator.pop(context); // Đóng drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LocationTestScreen(),
                   ),
                 );
               },
@@ -273,24 +285,19 @@ class _HomePageState extends State<HomePage> {
                 final String displayName = snapshot.hasData && snapshot.data?.name.isNotEmpty == true
                     ? snapshot.data!.name
                     : currentUser?.displayName ?? 'Người dùng';
-                
-                final bool isAdmin = snapshot.hasData && 
-                    snapshot.data?.role == app_user.UserRole.admin;
+                  final bool isAdmin = false; // Không còn admin trong app này
                 
                 return GradientCard(
-                  gradientColors: isAdmin 
-                      ? [Colors.amber.shade300, Colors.orange.shade700]
-                      : [Colors.blue.shade300, Colors.indigo.shade700],
+                  gradientColors: [Colors.blue.shade300, Colors.indigo.shade700],
                   elevation: 4,
                   margin: const EdgeInsets.all(16.0),
                   borderRadius: 16,
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
-                    children: [
-                      AnimatedAvatar(
+                    children: [                      AnimatedAvatar(
                         text: displayName,
                         radius: 35,
-                        backgroundColor: isAdmin ? Colors.amber : Colors.blue,
+                        backgroundColor: Colors.blue,
                         textColor: Colors.white,
                         onTap: () {
                           Navigator.push(
@@ -316,8 +323,7 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: 22,
                                 color: Colors.white,
                               ),
-                            ),
-                            const SizedBox(height: 4),
+                            ),                            const SizedBox(height: 4),
                             // Hiển thị vai trò
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -325,9 +331,9 @@ class _HomePageState extends State<HomePage> {
                                 color: Colors.black.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: Text(
-                                isAdmin ? 'Quản trị viên' : 'Thành viên',
-                                style: const TextStyle(
+                              child: const Text(
+                                'Thành viên',
+                                style: TextStyle(
                                   fontSize: 14,
                                   color: Colors.white,
                                 ),

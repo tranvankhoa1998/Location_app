@@ -1,9 +1,9 @@
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
-import '../datasources/user_realtime_db_datasource.dart';
+import '../datasources/user_firestore_datasource.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final UserRealtimeDBDataSource dataSource;
+  final UserFirestoreDataSource dataSource;
 
   UserRepositoryImpl(this.dataSource);
 
@@ -23,13 +23,8 @@ class UserRepositoryImpl implements UserRepository {
   }
 
   @override
-  Future<void> createUserProfile(String uid, String email, {UserRole role = UserRole.user}) async {
-    await dataSource.createUserProfile(uid, email, role: role);
-  }
-
-  @override
-  Future<void> updateUserRole(String uid, UserRole role) async {
-    await dataSource.updateUserRole(uid, role);
+  Future<void> createUserProfile(String uid, String email) async {
+    await dataSource.createUserProfile(uid, email);
   }
 
   @override
@@ -56,4 +51,4 @@ class UserRepositoryImpl implements UserRepository {
       avatarUrl: avatarUrl,
     );
   }
-} 
+}

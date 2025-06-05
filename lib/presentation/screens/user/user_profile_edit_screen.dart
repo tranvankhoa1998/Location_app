@@ -225,35 +225,26 @@ class _UserProfileEditScreenState extends State<UserProfileEditScreen> {
                           ),
                         ),
                         const SizedBox(height: 32),
-                        
-                        // Thông tin vai trò
+                          // Thông tin vai trò
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: _currentUser?.role == app_user.UserRole.admin
-                                ? Colors.amber.shade50
-                                : Colors.blue.shade50,
+                            color: Colors.blue.shade50,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
                               Icon(
-                                _currentUser?.role == app_user.UserRole.admin
-                                    ? Icons.admin_panel_settings
-                                    : Icons.person,
-                                color: _currentUser?.role == app_user.UserRole.admin
-                                    ? Colors.amber.shade700
-                                    : Colors.blue.shade700,
+                                Icons.person,
+                                color: Colors.blue.shade700,
                               ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
-                                  'Vai trò: ${_currentUser?.role == app_user.UserRole.admin ? 'Quản trị viên' : 'Người dùng'}',
+                                  'Vai trò: Người dùng',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: _currentUser?.role == app_user.UserRole.admin
-                                        ? Colors.amber.shade800
-                                        : Colors.blue.shade800,
+                                    color: Colors.blue.shade800,
                                   ),
                                 ),
                               ),
